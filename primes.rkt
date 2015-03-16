@@ -1,5 +1,6 @@
 #lang racket
-(provide while factorization limit-factors)
+(provide while)
+(provide (prefix-out primes: (combine-out factorization limit-factors)))
 
 
 (define-syntax-rule (while condition body ...)

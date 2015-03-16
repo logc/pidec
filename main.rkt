@@ -1,10 +1,10 @@
 #lang racket
 
+(require math)
 
 (require "primes.rkt")
 
 (module+ test
-  (require math)
   (require rackunit))
 
 
@@ -47,24 +47,24 @@
   (test-case
     "Decompose powers"
     (let* ([a 60] [k 4] [m 30]
-           [raw-factors (factorization m)]
-           [factors (limit-factors k raw-factors)])
+           [raw-factors (primes:factorization m)]
+           [factors (primes:limit-factors k raw-factors)])
       (check-equal? raw-factors #(2 3 5))
       (check-equal? factors #(2 3))
       (check-equal? (decompose-powers a factors) #(5 4 3)))
     (let* ([a 60] [k 6] [m 30]
-           [raw-factors (factorization m)]
-           [factors (limit-factors k raw-factors)])
+           [raw-factors (primes:factorization m)]
+           [factors (primes:limit-factors k raw-factors)])
       (check-equal? raw-factors #(2 3 5))
       (check-equal? factors raw-factors)
       (check-equal? (decompose-powers a factors) #(1 4 3 5)))
     (let* ([a 6] [k 6] [m 30]
-           [factors (limit-factors k (factorization m))])
+           [factors (primes:limit-factors k (primes:factorization m))])
       (check-equal? (decompose-powers a factors) #(1 2 3 1)))
     (check-exn exn:fail:contract?
-      (lambda () (decompose-powers -1 (factorization 21))))
+      (lambda () (decompose-powers -1 (primes:factorization 21))))
     (check-exn exn:fail:contract?
-      (lambda () (decompose-powers 60.0 (factorization 21))))
+      (lambda () (decompose-powers 60.0 (primes:factorization 21))))
     (check-exn exn:fail:contract?
       (lambda () (decompose-powers 60 #(-2 3 5))))))
 
@@ -79,7 +79,7 @@
 
 (define/contract (sum-binomials-modulo k N m)
   (natural-number/c natural-number/c positive? . -> . natural-number/c)
-  (let* ([factors (limit-factors k (factorization m))]
+  (let* ([factors (primes:limit-factors k (primes:factorization m))]
          [l (vector-length factors)]
          [A 1] [B 1] [C 1]
          [R (make-vector (vector-length factors) 1)]
@@ -118,3 +118,37 @@
     (check-exn exn:fail:contract? (lambda () (sum-binomials-modulo 6.0 6 30)))
     (check-exn exn:fail:contract? (lambda () (sum-binomials-modulo 6 6.0 30)))
     (check-exn exn:fail:contract? (lambda () (sum-binomials-modulo 6 6 30.0)))))
+
+
+(define (fractional-part n)
+  (- n (floor n)))
+
+
+(module+ test
+  (test-case
+    "Fractional part of a number"
+    (check-= (fractional-part 3.14) 0.14 0.001)))
+
+
+(define (pi-digit n n_0)
+  (let* ([M (2 . * . (exact-ceiling (n . / . (expt (log n) 3))))]
+         [N (exact-ceiling
+                ((+ n n_0 1) . * . ((log 10) . / . (log (* 2 euler.0 M)))))]
+         [b 0.0] [c 0.0])
+    (for ([k (in-range N)])
+      (let ([x (modulo (4 . * . (expt 10 n)) ((2 . * . k) . + . 1))])
+        (set! b (fractional-part (b . + . (((expt -1 k) . * . x) . / . ((2 . * . k) . + . 1)))))))
+    (for ([k (in-range N)])
+      (let* ([m (+ (* 2 M N) (* 2 k) 1)]
+             [x (sum-binomials-modulo k N m)]
+             [y (modulo (round (* (expt 5 (N . - . 2)) (expt 10 ((n . - . N) . + .
+								       2)) x)) m)])
+        (set! c (fractional-part (c . + . (((expt -1 k) . * . y) . / . m))))))
+    (fractional-part (- b c))))
+
+(module+ test
+  (test-case
+    "Pi digit"
+    (let* ([n_0 3] [n 14] [epsilon (expt 10 (-1 . * . n_0))])
+      (check-= (pi-digit n n_0) (fractional-part ((expt 10 n) . * . pi))
+               epsilon))))
