@@ -47,24 +47,24 @@
   (test-case
     "Decompose powers"
     (let* ([a 60] [k 4] [m 30]
-           [raw-factors (primes:factorization m)]
+           [raw-factors (primes:unique-factors m)]
            [factors (primes:limit-factors k raw-factors)])
       (check-equal? raw-factors #(2 3 5))
       (check-equal? factors #(2 3))
       (check-equal? (decompose-powers a factors) #(5 4 3)))
     (let* ([a 60] [k 6] [m 30]
-           [raw-factors (primes:factorization m)]
+           [raw-factors (primes:unique-factors m)]
            [factors (primes:limit-factors k raw-factors)])
       (check-equal? raw-factors #(2 3 5))
       (check-equal? factors raw-factors)
       (check-equal? (decompose-powers a factors) #(1 4 3 5)))
     (let* ([a 6] [k 6] [m 30]
-           [factors (primes:limit-factors k (primes:factorization m))])
+           [factors (primes:limit-factors k (primes:unique-factors m))])
       (check-equal? (decompose-powers a factors) #(1 2 3 1)))
     (check-exn exn:fail:contract?
-      (lambda () (decompose-powers -1 (primes:factorization 21))))
+      (lambda () (decompose-powers -1 (primes:unique-factors 21))))
     (check-exn exn:fail:contract?
-      (lambda () (decompose-powers 60.0 (primes:factorization 21))))
+      (lambda () (decompose-powers 60.0 (primes:unique-factors 21))))
     (check-exn exn:fail:contract?
       (lambda () (decompose-powers 60 #(-2 3 5))))))
 
@@ -79,7 +79,7 @@
 
 (define/contract (sum-binomials-modulo k N m)
   (natural-number/c natural-number/c positive? . -> . natural-number/c)
-  (let* ([factors (primes:limit-factors k (primes:factorization m))]
+  (let* ([factors (primes:limit-factors k (primes:unique-factors m))]
          [l (vector-length factors)]
          [A 1] [B 1] [C 1]
          [R (make-vector (vector-length factors) 1)]
@@ -97,7 +97,7 @@
       (set! A (modulo (* A a*) m))
       (set! B (modulo (* B b*) m))
       (set! C (+ (* C (vector-ref b-powers 0)) (modulo (* A (product R)) m))))
-    (/ C (modulo B m))))
+    (* C (modular-inverse B m))))
 
 
 (module+ test
@@ -121,13 +121,20 @@
 
 
 (define (fractional-part n)
-  (- n (floor n)))
+  (let ([value (abs n)])
+    (if (value . < . 1)
+      value
+      (- value (floor value)))))
 
 
 (module+ test
   (test-case
     "Fractional part of a number"
-    (check-= (fractional-part 3.14) 0.14 0.001)))
+    (let ([epsilon 0.001])
+      (check-= (fractional-part 3.14) 0.14 epsilon)
+      (check-= (fractional-part -1.400) 0.4 epsilon)
+      (check-= (fractional-part 0.756) 0.756 epsilon)
+      (check-= (fractional-part -0.332) 0.332 epsilon))))
 
 
 (define (pi-digit n n_0)
@@ -135,20 +142,26 @@
          [N (exact-ceiling
                 ((+ n n_0 1) . * . ((log 10) . / . (log (* 2 euler.0 M)))))]
          [b 0.0] [c 0.0])
-    (for ([k (in-range N)])
-      (let ([x (modulo (4 . * . (expt 10 n)) ((2 . * . k) . + . 1))])
+    (for ([k (in-range ((M . + . 1) . * . N))])
+      (let ([x (with-modulus ((2 . * . k) . + . 1) (mod* 4 (modexpt 10 n)))])
         (set! b (fractional-part (b . + . (((expt -1 k) . * . x) . / . ((2 . * . k) . + . 1)))))))
     (for ([k (in-range N)])
       (let* ([m (+ (* 2 M N) (* 2 k) 1)]
              [x (sum-binomials-modulo k N m)]
-             [y (modulo (round (* (expt 5 (N . - . 2)) (expt 10 ((n . - . N) . + .
-								       2)) x)) m)])
+             [y (with-modulus m (mod* (expt 5 (N . - . 2))  x) (expt 10 ((n . - . N) . + . 2)))])
         (set! c (fractional-part (c . + . (((expt -1 k) . * . y) . / . m))))))
     (fractional-part (- b c))))
 
 (module+ test
   (test-case
     "Pi digit"
-    (let* ([n_0 3] [n 14] [epsilon (expt 10 (-1 . * . n_0))])
+    (let* ([n_0 2]
+           [n 8]
+           [epsilon (expt 10 (-1 . * . n_0))])
       (check-= (pi-digit n n_0) (fractional-part ((expt 10 n) . * . pi))
-               epsilon))))
+               epsilon)
+    (let* ([n_0 3]
+	   [n 12]
+	   [epsilon (expt 10 (-1 . * . n_0))])
+      (check-= (pi-digit n n_0) (fractional-part ((expt 10 n) . * . pi))
+	       epsilon)))))

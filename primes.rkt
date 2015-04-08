@@ -1,6 +1,6 @@
 #lang racket
 (provide while)
-(provide (prefix-out primes: (combine-out factorization limit-factors)))
+(provide (prefix-out primes: (combine-out unique-factors factorization limit-factors)))
 
 
 (define-syntax-rule (while condition body ...)
@@ -21,6 +21,12 @@
                #:when (vector-ref A idx))
     idx))
 
+(define unique/vector
+  (let ([sort-ascending (lambda (lst) (sort lst <))])
+    (compose1 list->vector sort-ascending set->list list->set vector->list)))
+
+(define (unique-factors n)
+  (unique/vector (factorization n)))
 
 (define/contract (factorization n)
   ((>=/c 2) . -> . (vectorof positive?))
@@ -57,6 +63,10 @@
     (check-exn exn:fail:contract? (lambda () (factorization -1)))
     (check-exn exn:fail:contract? (lambda () (factorization 0)))
     (check-exn exn:fail:contract? (lambda () (factorization 1))))
+
+  (test-case
+    "Unique factors do not allow duplicates"
+    (check-equal? (unique-factors 81) #(3)))
 
   (test-case
     "Limit factors to less or equal to a number"
