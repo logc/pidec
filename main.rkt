@@ -162,6 +162,5 @@
                epsilon)
     (let* ([n_0 3]
 	   [n 12]
-	   [epsilon (expt 10 (-1 . * . n_0))])
-      (check-= (pi-digit n n_0) (fractional-part ((expt 10 n) . * . pi))
-	       epsilon)))))
+           [epsilon (expt 10 (-1 . * . n_0))])
+      (check-= (pi-digit n n_0) (fractional-part ((expt 10 n) . * . pi)) epsilon)))))
