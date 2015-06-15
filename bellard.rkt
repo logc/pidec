@@ -18,6 +18,9 @@
     (when (= (modulo term prime) 0) (do-loop)))
   (values term v))
 
+(define (fmod num mod)
+  (- num (* (truncate (/ num mod)) mod)))
+
 (define (main n)
   (define 𝛆 20)
   (define base 10)
@@ -68,12 +71,8 @@
     (check-= (main 50) 58209749 1e-12)
     (check-= (main 23) 433832795 1e-12)
     (check-= (main 107) 865132823 1e-12)
-    (check-= (main 403) 57270365 1e-12)))
+    (check-= (main 403) 57270365 1e-12))
 
-(define (fmod num mod)
-  (- num (* (truncate (/ num mod)) mod)))
-
-(module+ test
   (test-case
     "Floating-point modulo"
     (check-= (fmod 2.5 2) 0.5 1e-12)
