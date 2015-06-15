@@ -7,35 +7,6 @@
 (define (mul_mod a b m)
   (with-modulus m (mod* a b)))
 
-(define (inv_mod x y)
-  (define q 0)
-  (define u x)
-  (define v y)
-  (define a 0)
-  (define c 1)
-  (define t 0)
-  (let do-loop ()
-    (set! q (quotient v u))
-    (set! t c)
-    (set! c (- a (* q c)))
-    (set! a t)
-    (set! t u)
-    (set! u (- v (* q u)))
-    (set! v t)
-    (when (not (eq? u 0)) (do-loop)))
-  (set! a (remainder a y))
-  (when (< a 0)
-    (set! a (+ y a)))
-  (exact-floor a))
-
-(module+ test
-  (require rackunit)
-  (test-case
-    "Modular inverse"
-    (check-= (inv_mod 2 3) (modular-inverse 2 3) 1e-12)
-    (check-= (inv_mod 5 4) (modular-inverse 5 4) 1e-12)
-    (check-= (inv_mod 6 1) (modular-inverse 6 1) 1e-12)))
-
 (define (main n)
   (define av 0)
   (define a 0)
@@ -89,7 +60,7 @@
       (set! den (mul_mod den t av))
       (set! kq2 (+ kq2 2))
       (when (v . > . 0)
-        (set! t (inv_mod den av))
+        (set! t (modular-inverse den av))
         (set! t (mul_mod t num av))
         (set! t (mul_mod t k av))
         (for ([i (in-range v vmax)])
@@ -103,6 +74,7 @@
   (exact-floor (* sum 1e9)))
 
 (module+ test
+  (require rackunit)
   (test-case
     "Pi approximation"
     (check-= (main 50) 58209749 1e-12)
