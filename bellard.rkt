@@ -1,44 +1,50 @@
-#lang racket
+#lang typed/racket
 (require math/number-theory)
 (require racket/cmdline)
 
 (require (planet dyoo/while-loop))
 
-(define (update-while-decreasing term v prime)
+(provide main fmod)
+
+(define: (update-while-decreasing
+           [term : Integer] [v : Integer] [prime : Integer]) : (values Integer Integer)
   (let do-loop ()
     (set! term (quotient term prime))
     (set! v (sub1 v))
     (when (= (modulo term prime) 0) (do-loop)))
   (values term v))
 
-(define (update-while-increasing term v prime)
+(define: (update-while-increasing
+           [term : Integer] [v : Integer] [prime : Integer]) : (values Integer Integer)
   (let do-loop ()
     (set! term (quotient term prime))
     (set! v (add1 v))
     (when (= (modulo term prime) 0) (do-loop)))
   (values term v))
 
-(define (fmod num mod)
+(define: (fmod [num : Float] [mod : Float]) : Float
   (- num (* (truncate (/ num mod)) mod)))
 
-(define (main n)
-  (define 𝛆 20)
-  (define base 10)
-  (define N (exact-floor (* (+ n 𝛆) (/ (log base) (log 2)))))
-  (define (primes-between start end)
+(define: (main [n : Integer]) : Integer
+  (define: 𝛆 : Integer 20)
+  (define: base : Integer 10)
+  (define: N : Integer (exact-floor (* (+ n 𝛆) (cast (/ (log base) (log 2)) Real))))
+  (define: (primes-between
+             [start : Integer] [end : Integer]) : (Listof Integer)
     (filter prime? (range start end)))
-  (define sum
-    (for/sum ([prime (primes-between 3 (* 2 N))])
-      (define vmax (exact-floor (/ (log (* 2 N)) (log prime))))
-      (define max-modulo (expt prime vmax))
-      (define s 0)
-      (define num 1)
-      (define den 1)
-      (define v 0)
-      (define kq 1)
-      (define kq2 1)
-      (define term 0)
-      (for ([k (in-range 1 (add1 N))])
+  (define: sum : Exact-Rational
+    (for/sum : Exact-Rational ([prime : Integer (primes-between 3 (* 2 N))])
+      (define: vmax : Integer (exact-floor
+                                (cast (/ (log (* 2 N)) (log prime)) Real)))
+      (define: max-modulo : Positive-Integer (cast (expt prime vmax) Positive-Integer))
+      (define: s : Integer 0)
+      (define: num : Integer 1)
+      (define: den : Integer 1)
+      (define: v : Integer 0)
+      (define: kq : Integer 1)
+      (define: kq2 : Integer 1)
+      (define: term : Integer 0)
+      (for ([k : Integer (in-range 1 (add1 N))])
         (set! term k)
         (when (kq . >= . prime)
           (set!-values (term v) (update-while-decreasing term v prime))
@@ -62,26 +68,13 @@
       (set! term (modular-expt 10 (- n 1) max-modulo))
       (set! s (with-modulus max-modulo (mod* s term)))
       (/ s max-modulo)))
-  (exact-floor (* (fmod sum 1.0) 1e9)))
+  (exact-floor (* (fmod (exact->inexact sum) 1.0) 1e9)))
 
-(module+ test
-  (require rackunit)
-  (test-case
-    "Pi approximation"
-    (check-= (main 50) 58209749 1e-12)
-    (check-= (main 23) 433832795 1e-12)
-    (check-= (main 107) 865132823 1e-12)
-    (check-= (main 403) 57270365 1e-12))
-
-  (test-case
-    "Floating-point modulo"
-    (check-= (fmod 2.5 2) 0.5 1e-12)
-    (check-= (fmod 2 1.0) 0.0 1e-12)
-    (check-= (fmod 0.9 1.0) 0.9 1e-12)))
 
 (module+ main
-  (define position (string->number
-                     (vector-ref (current-command-line-arguments) 0)))
+  (define: position : Integer
+           (cast (string->number
+             (vector-ref (current-command-line-arguments) 0)) Integer))
   (displayln
     (string-append "Decimal digits of pi at position "
                    (~a position)
