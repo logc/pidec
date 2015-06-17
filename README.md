@@ -8,7 +8,11 @@ and his published code can be found under the `examples` folder, in `pi.c`.
 
 The implementation is in the module `bellard.rkt`, while its tests are defined
 in `test-bellard.rkt`. The first one is written in Typed Racket, while the
-second one is plain Racket.  
+second one is plain Racket. Apparently, Typed Racket does not support defining
+tests in submodules of the same file as the implementation. The typed
+implementation might be further optimized by constraining the types even more.
+ 
+
 ## Installation
 
 You will need to have Racket > 6.1 installed. Currently, these modules are
@@ -31,9 +35,6 @@ Pass the tests with `raco`
 
 TBD
 
-## Notes
+## Contributors
 
-Apparently, Typed Racket does not support defining tests in submodules of the
-same file as the implementation. The typed implementation might be further
-optimized by constraining the types even more.
-
+Sebastián Ortega (sortega)
