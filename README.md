@@ -4,7 +4,7 @@ These Racket modules implement an algorithm to compute *single decimals* of the
 sequence of π digits, using only a small amount of memory.
 
 This work is based on [Fabrice Bellard's paper](http://bellard.org/pi/pi_n2/pi_n2.html)
-and his published code can be found under the `example` folder, in `pi.c`.
+and his published code can be found [here](http://bellard.org/pi/pi.c).
 
 The implementation is in the module `bellard.rkt`, while its tests are defined
 in `test-bellard.rkt`. The first one is written in Typed Racket, while the
