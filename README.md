@@ -33,7 +33,7 @@ Pass the tests with `raco`
 
 ## License
 
-TBD
+These module are licensed under the MIT license. See LICENSE for details.
 
 ## Contributors
 
