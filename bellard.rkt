@@ -72,11 +72,14 @@
 
 
 (module+ main
+
   (define: position : Integer
-           (cast (string->number
-             (vector-ref (current-command-line-arguments) 0)) Integer))
+    (cast (string->number
+      (vector-ref (current-command-line-arguments) 0)) Integer))
+
   (displayln
-    (string-append "Decimal digits of pi at position "
-                   (~a position)
-                   ": "
-                   (~a (main position) #:width 9 #:align 'right #:pad-string "0"))))
+    (string-append
+      "Decimal digits of pi at position "
+      (~a position)
+      ": "
+      (~a (main position) #:width 9 #:align 'right #:pad-string "0"))))
