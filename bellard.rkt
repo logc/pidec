@@ -26,9 +26,9 @@
   (- num (* (truncate (/ num mod)) mod)))
 
 (define: (main [n : Integer]) : Integer
-  (define: 𝛆 : Integer 20)
-  (define: base : Integer 10)
-  (define: N : Integer (exact-floor (* (+ n 𝛆) (cast (/ (log base) (log 2)) Real))))
+  (define: 𝛆 : Positive-Integer 20)
+  (define: base : Positive-Integer 10)
+  (define: N : Integer (* (+ n 𝛆) (exact-floor (/ (log base) (log 2)))))
   (define: (primes-between
              [start : Integer] [end : Integer]) : (Listof Integer)
     (filter prime? (range start end)))
