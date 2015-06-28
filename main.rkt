@@ -29,7 +29,7 @@
 (define: (main [n : Integer]) : Integer
   (define: 𝛆 : Positive-Integer 20)
   (define: base : Positive-Integer 10)
-  (define: N : Integer (* (+ n 𝛆) (exact-floor (/ (log (exact->inexact base))
+  (define: N : Integer (exact-floor (* (+ n 𝛆) (/ (log (exact->inexact base))
                                                        (log 2.0)))))
   (define: (primes-between
              [start : Integer] [end : Integer]) : (Listof Integer)
