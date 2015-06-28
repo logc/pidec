@@ -1,7 +1,7 @@
 #lang racket
 (require rackunit)
 
-(require "bellard.rkt")
+(require "main.rkt")
 
 (test-case
     "Pi approximation"
