@@ -52,6 +52,6 @@ before_script:
 script:
   - cd ..   # Travis did a cd into the dir. Back up, for the next:
   - raco pkg install --deps search-auto --link pidec
-  - raco test -x -p pidec
+  - raco test -p pidec
 
 after_script:
