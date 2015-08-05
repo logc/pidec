@@ -3,7 +3,7 @@
 (require racket/cmdline)
 (require racket/unsafe/ops)
 
-(require (planet dyoo/while-loop))
+(require dyoo-while-loop)
 
 (provide main fmod)
 
