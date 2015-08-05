@@ -52,7 +52,7 @@ before_script:
 # includes some `deps`, the following is more elegant:
 script:
   - cd ..   # Travis did a cd into the dir. Back up, for the next:
-  - /usr/racket/bin/raco pkg install --deps search-auto --link pidec
-  - /usr/racket/bin/raco test -x -p pidec
+  - raco pkg install --deps search-auto --link pidec
+  - raco test -x -p pidec
 
 after_script:
