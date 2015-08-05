@@ -3,6 +3,8 @@
 Pidec implements an algorithm to compute *single decimals* of the sequence of π
 digits, using only a small amount of memory.
 
+[![Build Status](https://travis-ci.org/logc/pidec.svg?branch=master)](https://travis-ci.org/logc/pidec)
+
 ## References
 
 This work is based on [Fabrice Bellard's paper](http://bellard.org/pi/pi_n2/pi_n2.html)
