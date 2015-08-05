@@ -16,9 +16,9 @@ submodules of the same file as the implementation.
 
 ## Installation
 
-You will need to have Racket > 6.1 installed. Currently, these modules are
-**not** listed in Racket's package manager, so you will need to clone this
-repository.
+You will need to have Racket > 6.1 installed. Use Racket's built-in package manager:
+
+    $ raco pkg install pidec
 
 ## Usage
 
