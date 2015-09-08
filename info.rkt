@@ -4,7 +4,6 @@
                "rackunit-lib"
                "math-lib"
                "typed-racket-lib"
-               "unstable-contract-lib"
                "while-loop"))
 (define build-deps '("scribble-lib" "racket-doc"))
 (define scribblings '(("scribblings/pidec.scrbl" ())))
